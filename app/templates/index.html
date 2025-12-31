@@ -429,6 +429,9 @@
 
         // API URL - Point to Flask backend on localhost:5000
         const API_URL = 'http://localhost:5000/api';
+        
+        // Environment detection
+        const IS_GITHUB_PAGES = window.location.pathname.includes('my_movie_web');
 
         // ============ Utility Functions ============
         function showElement(id) {
@@ -571,7 +574,7 @@
                                     <a onclick="filterByLanguage(null)">📽️ All Movies</a>
                                 </div>
                             </li>
-                            <li><a onclick="navigateTo('admin')" style="cursor: pointer;">Admin</a></li>
+                            ${!IS_GITHUB_PAGES ? '<li><a onclick="navigateTo(\'admin\')" style="cursor: pointer;">Admin</a></li>' : ''}
                         </ul>
                     </div>
                 </nav>
@@ -591,7 +594,7 @@
                                 <h3>Quick Links</h3>
                                 <ul style="list-style: none;">
                                     <li><a onclick="navigateTo('home')">Home</a></li>
-                                    <li><a onclick="navigateTo('admin')">Admin Panel</a></li>
+                                    ${!IS_GITHUB_PAGES ? '<li><a onclick="navigateTo(\'admin\')">Admin Panel</a></li>' : ''}
                                 </ul>
                             </div>
                         </div>
@@ -678,6 +681,12 @@
 
         function renderPage() {
             const root = document.getElementById('root');
+            
+            // Prevent admin page access on GitHub Pages
+            if (IS_GITHUB_PAGES && currentPage === 'admin') {
+                currentPage = 'home';
+            }
+            
             fetchMovies(selectedLanguageFilter).then(movies => {
                 const content = currentPage === 'admin' ? renderAdminPage(movies) : renderHomePage(movies);
                 root.innerHTML = renderNavbar() + `<main>${content}</main>` + renderFooter();
