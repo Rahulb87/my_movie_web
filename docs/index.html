@@ -671,10 +671,11 @@
 
         // ============ Render Functions ============
         function renderMovieCard(movie, isAdmin = false) {
+            const clickHandler = movie.url ? `onclick="window.open('${movie.url}', '_blank')"` : '';
             return `
                 <div class="movie-card">
                     <div class="movie-image-container">
-                        <img src="${movie.image_url}" alt="${movie.title}" class="movie-image">
+                        <img src="${movie.image_url}" alt="${movie.title}" class="movie-image" ${clickHandler} ${movie.url ? 'style="cursor: pointer;"' : ''}>
                     </div>
                     <div class="movie-info">
                         <h3 class="movie-title">${movie.title}</h3>
