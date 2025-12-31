@@ -28,6 +28,8 @@ https://github.com/Rahulb87/my_movie_web/deployments
 https://Rahulb87.github.io/my_movie_web/
 ```
 
+**Note:** The site now uses in-memory data storage (no API calls), so all movies are stored temporarily in the browser. Refreshing the page will reset to demo data.
+
 ---
 
 ## ✅ What Works
@@ -40,6 +42,8 @@ https://Rahulb87.github.io/my_movie_web/
 | Admin panel | ✅ Add/edit/delete movies |
 | Responsive design | ✅ Mobile, tablet, desktop |
 | Dark theme | ✅ All styling applied |
+| Demo data | ✅ 3 sample movies included |
+| No API errors | ✅ Fixed - uses in-memory storage |
 
 ---
 
