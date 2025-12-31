@@ -482,30 +482,51 @@
 
         const API_BASE_URL = getAPIBaseURL();
 
-        async function loadMoviesFromJSON() {
+        async function loadMoviesFromAPI() {
             try {
-                // Try to load from movies.json file
+                // Try to load from Flask API (which reads from movies.json)
+                const response = await fetch(API_BASE_URL + '/api/movies');
+                if (response.ok) {
+                    const movies = await response.json();
+                    allMovies = Array.isArray(movies) ? movies : [];
+                    // Set movieIdCounter to max ID + 1
+                    if (allMovies.length > 0) {
+                        const maxId = Math.max(...allMovies.map(m => m.id));
+                        movieIdCounter = maxId + 1;
+                    } else {
+                        movieIdCounter = 1;
+                    }
+                    console.log('✅ Loaded movies from Flask API (movies.json on backend)');
+                    return true;
+                }
+            } catch (error) {
+                console.warn('⚠️ Flask backend not available:', error.message);
+            }
+            
+            // Fallback: Try to load from movies.json file directly
+            try {
                 const response = await fetch(MOVIES_JSON_PATH);
                 if (response.ok) {
                     const data = await response.json();
                     allMovies = data.movies || [];
                     movieIdCounter = data.nextId || 4;
-                    console.log('✅ Loaded movies from movies.json');
+                    console.log('✅ Loaded movies from movies.json file (backend not available)');
                     return true;
                 }
             } catch (error) {
                 console.error('Error loading from movies.json:', error);
             }
-            // If no file or error, use default data
+            
+            // Final fallback: Use default data
             allMovies = JSON.parse(JSON.stringify(defaultMovies));
             movieIdCounter = 4;
-            console.log('⚠️ Using default movies (movies.json not available)');
+            console.log('⚠️ Using default movies (no backend, no file available)');
             return false;
         }
 
-        // Load initial data from JSON file on page load
+        // Load initial data from API on page load
         (async () => {
-            await loadMoviesFromJSON();
+            await loadMoviesFromAPI();
             renderPage();
         })();
 
