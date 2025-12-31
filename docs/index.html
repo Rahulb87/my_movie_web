@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="CineHub - Your entertainment destination for Marathi, Hindi and Punjabi movies">
+    <title>CineHub - Movie Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f0f0f;
+            color: #ffffff;
+        }
+
+        html, body, #root {
+            height: 100%;
+            width: 100%;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        input, textarea, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 5px rgba(255, 107, 107, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b6b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-menu a, .nav-menu button {
+            color: #ffffff;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            background: none;
+            padding: 0;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .nav-menu a:hover, .nav-menu button:hover {
+            color: #ff6b6b;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #2d2d2d;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            padding: 12px 0;
+            z-index: 1001;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .dropdown-content a {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-section p {
+            font-size: 20px;
+            color: #cccccc;
+            margin-bottom: 30px;
+        }
+
+        /* Movies Grid */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 30px 0;
+        }
+
+        /* Movie Card */
+        .movie-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.2);
+        }
+
+        .movie-image-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 150%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .movie-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 20px;
+        }
+
+        .movie-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .movie-language {
+            font-size: 14px;
+            color: #ff6b6b;
+            margin-bottom: 8px;
+        }
+
+        .movie-date {
+            font-size: 12px;
+            color: #999999;
+            margin-bottom: 15px;
+        }
+
+        .movie-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #4ecdc4;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        /* Forms */
+        .form-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+
+        .form-container h2 {
+            color: #ff6b6b;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            background-color: #2d2d2d;
+            border: 2px solid #444444;
+            color: #ffffff;
+            padding: 12px;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: #ffffff;
+            padding: 40px 20px 20px;
+            margin-top: 60px;
+            border-top: 2px solid #ff6b6b;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+
+        .footer-bottom {
+            padding-top: 20px;
+            border-top: 1px solid #2d2d2d;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            color: #ff6b6b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 36px;
+            }
+
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .nav-menu {
+                gap: 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section {
+                padding: 40px 15px;
+            }
+
+            .movies-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        .section-title {
+            font-size: 28px;
+            margin-top: 50px;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 60px 20px;
+            text-align: center;
+            color: white;
+            border-bottom: 2px solid #ff6b6b;
+        }
+
+        .admin-header h1 {
+            color: #ff6b6b;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .add-movie-btn {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 15px 30px;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+
+        .add-movie-btn:hover {
+            background-color: #ff5252;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-message {
+            background-color: rgba(78, 205, 196, 0.1);
+            border-left: 4px solid #4ecdc4;
+            color: #4ecdc4;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .error-message {
+            background-color: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script>
+        // Get base path for GitHub Pages deployment
+        // If deployed at https://username.github.io/my_movie_web/, basePath = '/my_movie_web/'
+        // If deployed at http://localhost:5000/, basePath = '/'
+        function getBasePath() {
+            const pathname = window.location.pathname;
+            // Check if this is GitHub Pages deployment (contains 'my_movie_web')
+            if (pathname.includes('my_movie_web')) {
+                return '/my_movie_web/';
+            }
+            return '/';
+        }
+
+        const BASE_PATH = getBasePath();
+        const API_URL = BASE_PATH + 'api';
+
+        // Global state
+        let currentPage = 'home';
+        let selectedLanguageFilter = null;
+        let editingMovieId = null;
+        let allMovies = [];
+
+        // ============ Utility Functions ============
+        function showElement(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function hideElement(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function navigateTo(page) {
+            currentPage = page;
+            // Update URL history for proper navigation
+            if (page === 'home') {
+                window.history.pushState({page: 'home'}, 'Home', BASE_PATH);
+            } else if (page === 'admin') {
+                window.history.pushState({page: 'admin'}, 'Admin', BASE_PATH + 'admin');
+            }
+            renderPage();
+        }
+
+        function showMessage(message, isError = false) {
+            const container = document.querySelector('main');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isError ? 'error-message' : 'success-message';
+            messageDiv.textContent = message;
+            container.insertBefore(messageDiv, container.firstChild);
+            setTimeout(() => messageDiv.remove(), 3000);
+        }
+
+        // ============ API Functions ============
+        async function fetchMovies(language = null) {
+            try {
+                const url = language ? `${API_URL}/movies?language=${language}` : `${API_URL}/movies`;
+                const response = await fetch(url);
+                const data = await response.json();
+                allMovies = data;
+                return data;
+            } catch (error) {
+                console.error('Error fetching movies:', error);
+                showMessage('Failed to load movies', true);
+                return [];
+            }
+        }
+
+        async function addMovie(movieData) {
+            try {
+                const response = await fetch(`${API_URL}/movies`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(movieData)
+                });
+                if (response.ok) {
+                    showMessage('Movie added successfully!');
+                    document.getElementById('movieForm').reset();
+                    editingMovieId = null;
+                    await loadAndRender();
+                } else {
+                    showMessage('Failed to add movie', true);
+                }
+            } catch (error) {
+                console.error('Error adding movie:', error);
+                showMessage('Error adding movie', true);
+            }
+        }
+
+        async function updateMovie(id, movieData) {
+            try {
+                const response = await fetch(`${API_URL}/movies/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(movieData)
+                });
+                if (response.ok) {
+                    showMessage('Movie updated successfully!');
+                    document.getElementById('movieForm').reset();
+                    editingMovieId = null;
+                    await loadAndRender();
+                } else {
+                    showMessage('Failed to update movie', true);
+                }
+            } catch (error) {
+                console.error('Error updating movie:', error);
+                showMessage('Error updating movie', true);
+            }
+        }
+
+        async function deleteMovie(id) {
+            if (!confirm('Are you sure you want to delete this movie?')) return;
+            try {
+                const response = await fetch(`${API_URL}/movies/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showMessage('Movie deleted successfully!');
+                    await loadAndRender();
+                } else {
+                    showMessage('Failed to delete movie', true);
+                }
+            } catch (error) {
+                console.error('Error deleting movie:', error);
+                showMessage('Error deleting movie', true);
+            }
+        }
+
+        // ============ Render Functions ============
+        function renderMovieCard(movie, isAdmin = false) {
+            return `
+                <div class="movie-card">
+                    <div class="movie-image-container">
+                        <img src="${movie.image_url}" alt="${movie.title}" class="movie-image">
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <p class="movie-language">
+                            ${movie.language === 'marathi' ? '🎭 Marathi' : 
+                              movie.language === 'hindi' ? '🎬 Hindi' : 
+                              '🎪 Punjabi'}
+                        </p>
+                        <p class="movie-date">${new Date(movie.release_date).toLocaleDateString()}</p>
+                        ${isAdmin ? `
+                            <div class="movie-actions">
+                                <button class="edit-btn" onclick="editMovie(${movie.id})">Edit</button>
+                                <button class="delete-btn" onclick="deleteMovie(${movie.id})">Delete</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderNavbar() {
+            return `
+                <nav class="navbar">
+                    <div class="container">
+                        <div class="logo" onclick="navigateTo('home')" style="cursor: pointer;">
+                            <span class="logo-icon">🎬</span>
+                            <span>CineHub</span>
+                        </div>
+                        <ul class="nav-menu">
+                            <li><a onclick="navigateTo('home')" style="cursor: pointer;">Home</a></li>
+                            <li class="dropdown">
+                                <button class="dropdown-btn">Movies</button>
+                                <div class="dropdown-content">
+                                    <a onclick="filterByLanguage('marathi')">🎭 Marathi</a>
+                                    <a onclick="filterByLanguage('hindi')">🎬 Hindi</a>
+                                    <a onclick="filterByLanguage('punjabi')">🎪 Punjabi</a>
+                                    <a onclick="filterByLanguage(null)">📽️ All Movies</a>
+                                </div>
+                            </li>
+                            <li><a onclick="navigateTo('admin')" style="cursor: pointer;">Admin</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            `;
+        }
+
+        function renderFooter() {
+            return `
+                <footer class="footer">
+                    <div class="container">
+                        <div class="footer-content">
+                            <div class="footer-section">
+                                <h3>About</h3>
+                                <p>Your ultimate movie destination for Marathi, Hindi, and Punjabi films.</p>
+                            </div>
+                            <div class="footer-section">
+                                <h3>Quick Links</h3>
+                                <ul style="list-style: none;">
+                                    <li><a onclick="navigateTo('home')" style="cursor: pointer;">Home</a></li>
+                                    <li><a onclick="navigateTo('admin')" style="cursor: pointer;">Admin Panel</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="footer-bottom">
+                            <p><span class="footer-logo">🏢</span> © 2025 Rahul Corp. All rights reserved.</p>
+                            <p>CineHub™ - Your Entertainment Platform</p>
+                        </div>
+                    </div>
+                </footer>
+            `;
+        }
+
+        function renderHomePage(movies) {
+            return `
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1>Welcome to CineHub</h1>
+                        <p>Your entertainment destination for Marathi, Hindi & Punjabi Movies</p>
+                    </div>
+                </div>
+                <div class="container">
+                    <h2 class="section-title">
+                        ${selectedLanguageFilter ? selectedLanguageFilter.charAt(0).toUpperCase() + selectedLanguageFilter.slice(1) + ' Movies' : 'Latest Movies'}
+                    </h2>
+                    <div class="movies-grid">
+                        ${movies.map(movie => renderMovieCard(movie, false)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminPage(movies) {
+            return `
+                <div class="admin-header">
+                    <h1>Admin Panel</h1>
+                    <p>Manage your movie collection</p>
+                </div>
+                <div class="container">
+                    <button class="add-movie-btn" onclick="showAddForm()">+ Add New Movie</button>
+                    
+                    <div id="formContainer" class="hidden">
+                        <div class="form-container">
+                            <h2>${editingMovieId ? 'Edit Movie' : 'Add New Movie'}</h2>
+                            <form id="movieForm" onsubmit="handleFormSubmit(event)">
+                                <div class="form-group">
+                                    <label>Movie Title *</label>
+                                    <input type="text" name="title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Language *</label>
+                                    <select name="language" required>
+                                        <option value="marathi">🎭 Marathi</option>
+                                        <option value="hindi">🎬 Hindi</option>
+                                        <option value="punjabi">🎪 Punjabi</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Movie URL</label>
+                                    <input type="url" name="url">
+                                </div>
+                                <div class="form-group">
+                                    <label>Image URL</label>
+                                    <input type="url" name="image_url">
+                                </div>
+                                <div class="form-group">
+                                    <label>Release Date</label>
+                                    <input type="date" name="release_date">
+                                </div>
+                                <button type="submit" style="background-color: #ff6b6b; color: white; margin-right: 10px;">
+                                    ${editingMovieId ? 'Update Movie' : 'Add Movie'}
+                                </button>
+                                <button type="button" onclick="cancelForm()" style="background-color: #444444;">Cancel</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">All Movies (${movies.length})</h2>
+                    <div class="movies-grid">
+                        ${movies.map(movie => renderMovieCard(movie, true)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPage() {
+            const root = document.getElementById('root');
+            fetchMovies(selectedLanguageFilter).then(movies => {
+                const content = currentPage === 'admin' ? renderAdminPage(movies) : renderHomePage(movies);
+                root.innerHTML = renderNavbar() + `<main>${content}</main>` + renderFooter();
+                if (currentPage === 'admin' && editingMovieId === null) {
+                    hideElement('formContainer');
+                }
+            });
+        }
+
+        // ============ Event Handlers ============
+        function filterByLanguage(language) {
+            selectedLanguageFilter = language;
+            renderPage();
+        }
+
+        function showAddForm() {
+            editingMovieId = null;
+            showElement('formContainer');
+        }
+
+        function cancelForm() {
+            editingMovieId = null;
+            document.getElementById('movieForm').reset();
+            hideElement('formContainer');
+        }
+
+        function editMovie(id) {
+            editingMovieId = id;
+            const movie = allMovies.find(m => m.id === id);
+            if (movie) {
+                document.querySelector('input[name="title"]').value = movie.title;
+                document.querySelector('select[name="language"]').value = movie.language;
+                document.querySelector('input[name="url"]').value = movie.url;
+                document.querySelector('input[name="image_url"]').value = movie.image_url;
+                document.querySelector('input[name="release_date"]').value = movie.release_date.split('T')[0];
+                showElement('formContainer');
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const movieData = {
+                title: formData.get('title'),
+                language: formData.get('language'),
+                url: formData.get('url'),
+                image_url: formData.get('image_url'),
+                release_date: formData.get('release_date')
+            };
+
+            if (editingMovieId) {
+                updateMovie(editingMovieId, movieData);
+            } else {
+                addMovie(movieData);
+            }
+        }
+
+        async function loadAndRender() {
+            await renderPage();
+        }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', function(event) {
+            if (event.state && event.state.page) {
+                currentPage = event.state.page;
+            } else {
+                currentPage = 'home';
+            }
+            renderPage();
+        });
+
+        // ============ Initialize ============
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if URL contains admin route
+            const pathname = window.location.pathname;
+            if (pathname.includes('/admin') || pathname.endsWith('admin')) {
+                currentPage = 'admin';
+            } else {
+                currentPage = 'home';
+            }
+            renderPage();
+        });
+    </script>
+</body>
+</html>
