@@ -473,14 +473,25 @@
         ];
 
         // ============ Storage Functions ============
+        // Determine API URL based on environment
+        function getAPIBaseURL() {
+            const isLocalhost = window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1';
+            return isLocalhost ? 'http://localhost:5000' : BASE_PATH;
+        }
+
+        const API_BASE_URL = getAPIBaseURL();
+
         async function loadMoviesFromJSON() {
             try {
+                // Try to load from movies.json file
                 const response = await fetch(MOVIES_JSON_PATH);
                 if (response.ok) {
                     const data = await response.json();
                     allMovies = data.movies || [];
                     movieIdCounter = data.nextId || 4;
-                    return;
+                    console.log('✅ Loaded movies from movies.json');
+                    return true;
                 }
             } catch (error) {
                 console.error('Error loading from movies.json:', error);
@@ -488,54 +499,13 @@
             // If no file or error, use default data
             allMovies = JSON.parse(JSON.stringify(defaultMovies));
             movieIdCounter = 4;
-        }
-
-        async function saveMoviesToJSON() {
-            try {
-                const data = {
-                    movies: allMovies,
-                    nextId: movieIdCounter,
-                    lastUpdated: new Date().toISOString()
-                };
-                
-                // For GitHub Pages (static hosting), save to browser storage as fallback
-                // In production with backend, this would POST to a server endpoint
-                if (IS_GITHUB_PAGES) {
-                    // Save to localStorage for persistence in GitHub Pages
-                    localStorage.setItem('cinehub_movies_db', JSON.stringify(data));
-                    console.log('Movie data saved (GitHub Pages mode - localStorage)');
-                } else {
-                    // For local development with server, could implement server save
-                    console.log('Movie data updated (offline mode)');
-                }
-            } catch (error) {
-                console.error('Error saving movies:', error);
-            }
-        }
-
-        function exportAsJSON() {
-            const data = {
-                movies: allMovies,
-                nextId: movieIdCounter,
-                exportedAt: new Date().toISOString()
-            };
-            return JSON.stringify(data, null, 2);
+            console.log('⚠️ Using default movies (movies.json not available)');
+            return false;
         }
 
         // Load initial data from JSON file on page load
         (async () => {
             await loadMoviesFromJSON();
-            // Try to restore from localStorage if available (for user edits on GitHub Pages)
-            try {
-                const stored = localStorage.getItem('cinehub_movies_db');
-                if (stored) {
-                    const data = JSON.parse(stored);
-                    allMovies = data.movies || allMovies;
-                    movieIdCounter = data.nextId || movieIdCounter;
-                }
-            } catch (error) {
-                console.warn('Could not restore from localStorage:', error);
-            }
             renderPage();
         })();
 
@@ -568,7 +538,7 @@
             setTimeout(() => messageDiv.remove(), 3000);
         }
 
-        // ============ In-Memory Data Functions (No API calls) ============
+        // ============ In-Memory Data Functions (with API persistence) ============
         function getMoviesByLanguage(language = null) {
             if (!language) return allMovies;
             return allMovies.filter(movie => movie.language === language);
@@ -579,54 +549,121 @@
             return Promise.resolve(getMoviesByLanguage(language));
         }
 
-        function addMovie(movieData) {
-            const newMovie = {
-                id: movieIdCounter++,
-                title: movieData.title,
-                language: movieData.language,
-                url: movieData.url || '',
-                image_url: movieData.image_url || 'https://via.placeholder.com/300x400?text=' + encodeURIComponent(movieData.title),
-                release_date: movieData.release_date || new Date().toISOString().split('T')[0]
-            };
-            allMovies.push(newMovie);
-            saveMoviesToJSON();  // Save to movies.json
-            showMessage('Movie added successfully!');
-            document.getElementById('movieForm').reset();
-            editingMovieId = null;
-            loadAndRender();
-            return Promise.resolve();
-        }
-
-        function updateMovie(id, movieData) {
-            const movieIndex = allMovies.findIndex(m => m.id === id);
-            if (movieIndex !== -1) {
-                allMovies[movieIndex] = {
-                    id: id,
+        async function addMovie(movieData) {
+            try {
+                // Add to local array first
+                const newMovie = {
+                    id: movieIdCounter++,
                     title: movieData.title,
                     language: movieData.language,
                     url: movieData.url || '',
                     image_url: movieData.image_url || 'https://via.placeholder.com/300x400?text=' + encodeURIComponent(movieData.title),
-                    release_date: movieData.release_date || allMovies[movieIndex].release_date
+                    release_date: movieData.release_date || new Date().toISOString().split('T')[0]
                 };
-                saveMoviesToJSON();  // Save to movies.json
-                showMessage('Movie updated successfully!');
+                
+                allMovies.push(newMovie);
+                
+                // Try to save to API (if backend available)
+                try {
+                    const response = await fetch(API_BASE_URL + '/api/movies', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newMovie)
+                    });
+                    
+                    if (response.ok) {
+                        console.log('✅ Movie saved to backend (movies.json)');
+                    } else {
+                        console.warn('⚠️ Could not save to backend, but movie is in memory');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Backend not available, movie saved to memory only:', error.message);
+                }
+                
+                showMessage('Movie added successfully!');
                 document.getElementById('movieForm').reset();
                 editingMovieId = null;
                 loadAndRender();
+                return Promise.resolve();
+            } catch (error) {
+                showMessage('Error adding movie: ' + error.message, true);
+                return Promise.reject(error);
             }
-            return Promise.resolve();
         }
 
-        function deleteMovie(id) {
-            if (!confirm('Are you sure you want to delete this movie?')) return Promise.resolve();
-            const movieIndex = allMovies.findIndex(m => m.id === id);
-            if (movieIndex !== -1) {
-                allMovies.splice(movieIndex, 1);
-                saveMoviesToJSON();  // Save to movies.json
-                showMessage('Movie deleted successfully!');
-                loadAndRender();
+        async function updateMovie(id, movieData) {
+            try {
+                const movieIndex = allMovies.findIndex(m => m.id === id);
+                if (movieIndex !== -1) {
+                    allMovies[movieIndex] = {
+                        id: id,
+                        title: movieData.title,
+                        language: movieData.language,
+                        url: movieData.url || '',
+                        image_url: movieData.image_url || 'https://via.placeholder.com/300x400?text=' + encodeURIComponent(movieData.title),
+                        release_date: movieData.release_date || allMovies[movieIndex].release_date
+                    };
+                    
+                    // Try to save to API (if backend available)
+                    try {
+                        const response = await fetch(API_BASE_URL + '/api/movies/' + id, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(allMovies[movieIndex])
+                        });
+                        
+                        if (response.ok) {
+                            console.log('✅ Movie updated in backend (movies.json)');
+                        } else {
+                            console.warn('⚠️ Could not update in backend, but movie is updated in memory');
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Backend not available, movie updated in memory only:', error.message);
+                    }
+                    
+                    showMessage('Movie updated successfully!');
+                    document.getElementById('movieForm').reset();
+                    editingMovieId = null;
+                    loadAndRender();
+                }
+                return Promise.resolve();
+            } catch (error) {
+                showMessage('Error updating movie: ' + error.message, true);
+                return Promise.reject(error);
             }
-            return Promise.resolve();
+        }
+
+        async function deleteMovie(id) {
+            try {
+                if (!confirm('Are you sure you want to delete this movie?')) return Promise.resolve();
+                
+                const movieIndex = allMovies.findIndex(m => m.id === id);
+                if (movieIndex !== -1) {
+                    allMovies.splice(movieIndex, 1);
+                    
+                    // Try to delete from API (if backend available)
+                    try {
+                        const response = await fetch(API_BASE_URL + '/api/movies/' + id, {
+                            method: 'DELETE'
+                        });
+                        
+                        if (response.ok) {
+                            console.log('✅ Movie deleted from backend (movies.json)');
+                        } else {
+                            console.warn('⚠️ Could not delete from backend, but movie is removed from memory');
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Backend not available, movie removed from memory only:', error.message);
+                    }
+                    
+                    showMessage('Movie deleted successfully!');
+                    loadAndRender();
+                }
+                return Promise.resolve();
+            } catch (error) {
+                showMessage('Error deleting movie: ' + error.message, true);
+                return Promise.reject(error);
+            }
         }
 
         // ============ Render Functions ============

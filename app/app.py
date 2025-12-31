@@ -10,40 +10,51 @@ app = Flask(__name__,
             template_folder='templates')
 CORS(app)
 
-# Simple in-memory database
+# Path to movies.json file (in docs folder for GitHub Pages)
+MOVIES_JSON_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'docs', 'movies.json')
+
+# Global variables
 movies_db = []
 next_id = 1
 
-# Sample data
-sample_movies = [
-    {
-        'id': 1,
-        'title': 'Natrang',
-        'language': 'marathi',
-        'url': 'https://www.youtube.com/embed/sample1',
-        'image_url': 'https://via.placeholder.com/300x400?text=Natrang',
-        'release_date': '2023-01-15'
-    },
-    {
-        'id': 2,
-        'title': 'Laal Singh Chaddha',
-        'language': 'hindi',
-        'url': 'https://www.youtube.com/embed/sample2',
-        'image_url': 'https://via.placeholder.com/300x400?text=Laal+Singh',
-        'release_date': '2023-02-20'
-    },
-    {
-        'id': 3,
-        'title': 'Sardar Udham',
-        'language': 'punjabi',
-        'url': 'https://www.youtube.com/embed/sample3',
-        'image_url': 'https://via.placeholder.com/300x400?text=Sardar+Udham',
-        'release_date': '2023-03-10'
-    }
-]
+def load_movies_from_file():
+    """Load movies from movies.json file"""
+    global movies_db, next_id
+    
+    try:
+        if os.path.exists(MOVIES_JSON_PATH):
+            with open(MOVIES_JSON_PATH, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                movies_db = data.get('movies', [])
+                next_id = data.get('nextId', len(movies_db) + 1)
+                print(f"✅ Loaded {len(movies_db)} movies from {MOVIES_JSON_PATH}")
+                return True
+    except Exception as e:
+        print(f"❌ Error loading movies from file: {e}")
+    
+    return False
 
-movies_db.extend(sample_movies)
-next_id = 4
+def save_movies_to_file():
+    """Save movies to movies.json file"""
+    try:
+        data = {
+            'movies': movies_db,
+            'nextId': next_id,
+            'lastUpdated': datetime.now().isoformat()
+        }
+        
+        os.makedirs(os.path.dirname(MOVIES_JSON_PATH), exist_ok=True)
+        
+        with open(MOVIES_JSON_PATH, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            print(f"✅ Saved {len(movies_db)} movies to {MOVIES_JSON_PATH}")
+        return True
+    except Exception as e:
+        print(f"❌ Error saving movies to file: {e}")
+        return False
+
+# Load movies from file on startup
+load_movies_from_file()
 
 # ============ API ROUTES ============
 
@@ -85,11 +96,14 @@ def create_movie():
         'language': data.get('language'),
         'url': data.get('url', ''),
         'image_url': data.get('image_url', ''),
-        'release_date': data.get('release_date', datetime.now().isoformat())
+        'release_date': data.get('release_date', datetime.now().isoformat().split('T')[0])
     }
     
     movies_db.append(new_movie)
     next_id += 1
+    
+    # Save to file
+    save_movies_to_file()
     
     return jsonify(new_movie), 201
 
@@ -115,6 +129,9 @@ def update_movie(movie_id):
     if 'release_date' in data:
         movie['release_date'] = data['release_date']
     
+    # Save to file
+    save_movies_to_file()
+    
     return jsonify(movie)
 
 @app.route('/api/movies/<int:movie_id>', methods=['DELETE'])
@@ -128,6 +145,9 @@ def delete_movie(movie_id):
         return jsonify({'error': 'Movie not found'}), 404
     
     movies_db = [m for m in movies_db if m['id'] != movie_id]
+    
+    # Save to file
+    save_movies_to_file()
     
     return jsonify({'message': 'Movie deleted successfully'})
 
