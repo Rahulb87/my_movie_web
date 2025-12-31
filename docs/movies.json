@@ -1,30 +1,34 @@
-{
-  "movies": [
-    {
-      "id": 1,
-      "title": "Natrang",
-      "language": "marathi",
-      "url": "https://www.youtube.com/embed/sample1",
-      "image_url": "https://via.placeholder.com/300x400?text=Natrang",
-      "release_date": "2023-01-15"
-    },
-    {
-      "id": 2,
-      "title": "Laal Singh Chaddha",
-      "language": "hindi",
-      "url": "https://www.youtube.com/embed/sample2",
-      "image_url": "https://via.placeholder.com/300x400?text=Laal+Singh",
-      "release_date": "2023-02-20"
-    },
-    {
-      "id": 3,
-      "title": "Sardar Udham",
-      "language": "punjabi",
-      "url": "https://www.youtube.com/embed/sample3",
-      "image_url": "https://via.placeholder.com/300x400?text=Sardar+Udham",
-      "release_date": "2023-03-10"
-    }
-  ],
-  "nextId": 4,
-  "lastUpdated": "2025-12-31T10:00:00.000Z"
-}
+[
+  {
+    "id": 1,
+    "image_url": "https://scontent.fhyd1-6.fna.fbcdn.net/v/t39.30808-6/605544176_1417558220380591_1967876694372686120_n.jpg?stp=dst-jpg_p526x296_tt6&_nc_cat=111&ccb=1-7&_nc_sid=f727a1&_nc_ohc=g_AiXlo343YQ7kNvwGZ9XmJ&_nc_oc=AdncbSXaA8NGfuJn4wpwyKNNkrEhVs6CrNUG3HI5ZtEwLhnDdwqydFL_iIk727-LGAFRJEUpPPOPujh-iZrogkSR&_nc_zt=23&_nc_ht=scontent.fhyd1-6.fna&_nc_gid=wN5ZKwsd83VhfD3Ssj8Uvw&oh=00_AfkZ6qPm14G2uFLI54bcVafMC9sFzuqLg8ObLJIogZIIng&oe=695A924D",
+    "language": "hindi",
+    "release_date": "2025-12-31",
+    "title": "Mass Jathara 2025",
+    "url": "https://sdmoviespoint.christmas/mass-jathara-2025-full-movie-download-free-hd-web-dl-hindi-ddp5-1/"
+  },
+  {
+    "id": 2,
+    "image_url": "https://m.media-amazon.com/images/M/MV5BZTU5MDVmZDAtNjNlZS00NjU0LWE3MzAtMWYzZmI5MDE1Y2E3XkEyXkFqcGc@._V1_QL75_UX166_.jpg",
+    "language": "hindi",
+    "release_date": "2023-02-05",
+    "title": "Dhurandhar 2025",
+    "url": "https://sdmoviespoint.christmas/dhurandhar-2025-full-movie-download-free-hdtc/"
+  },
+  {
+    "id": 3,
+    "image_url": "https://bollyspice.com/wp-content/uploads/2025/12/IMG_1387.jpeg",
+    "language": "hindi",
+    "release_date": "2025-12-19",
+    "title": "Raat Akeli Hai: The Bansal Murders 2025",
+    "url": "https://sdmoviespoint.christmas/raat-akeli-hai-the-bansal-murders-2025-full-movie-download-free-hd-web-dl-hindi-ddp5-1/"
+  },
+  {
+    "id": 4,
+    "image_url": "https://bsmedia.business-standard.com/_media/bs/img/article/2025-07/29/full/1753772398-8946.png",
+    "language": "punjabi",
+    "release_date": "2025-12-31",
+    "title": "Avatar: Fire and Ash 2025",
+    "url": "https://sdmoviespoint.christmas/avatar-fire-and-ash-2025-full-movie-download-free-hdtc/"
+  }
+]
