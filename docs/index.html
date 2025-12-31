@@ -444,33 +444,7 @@
         let allMovies = [];
         let movieIdCounter = 4;
 
-        // Demo data - default data (used only if no storage exists)
-        const defaultMovies = [
-            {
-                'id': 1,
-                'title': 'Natrang',
-                'language': 'marathi',
-                'url': 'https://www.youtube.com/embed/sample1',
-                'image_url': 'https://via.placeholder.com/300x400?text=Natrang',
-                'release_date': '2023-01-15'
-            },
-            {
-                'id': 2,
-                'title': 'Laal Singh Chaddha',
-                'language': 'hindi',
-                'url': 'https://www.youtube.com/embed/sample2',
-                'image_url': 'https://via.placeholder.com/300x400?text=Laal+Singh',
-                'release_date': '2023-02-20'
-            },
-            {
-                'id': 3,
-                'title': 'Sardar Udham',
-                'language': 'punjabi',
-                'url': 'https://www.youtube.com/embed/sample3',
-                'image_url': 'https://via.placeholder.com/300x400?text=Sardar+Udham',
-                'release_date': '2023-03-10'
-            }
-        ];
+
 
         // ============ Storage Functions ============
         // Determine API URL based on environment
@@ -525,10 +499,10 @@
                 console.error('Error loading from movies.json:', error);
             }
             
-            // Final fallback: Use default data
-            allMovies = JSON.parse(JSON.stringify(defaultMovies));
-            movieIdCounter = 4;
-            console.log('⚠️ Using default movies (no backend, no file available)');
+            // Final fallback: Load empty array (no default data)
+            allMovies = [];
+            movieIdCounter = 1;
+            console.log('⚠️ No movies available - load from movies.json file');
             return false;
         }
 
