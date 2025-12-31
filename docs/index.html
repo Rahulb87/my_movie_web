@@ -508,8 +508,16 @@
                 const response = await fetch(MOVIES_JSON_PATH);
                 if (response.ok) {
                     const data = await response.json();
-                    allMovies = data.movies || [];
-                    movieIdCounter = data.nextId || 4;
+                    // Handle both array format and object format
+                    allMovies = Array.isArray(data) ? data : (data.movies || []);
+                    
+                    // Set movieIdCounter to max ID + 1
+                    if (allMovies.length > 0) {
+                        const maxId = Math.max(...allMovies.map(m => m.id));
+                        movieIdCounter = maxId + 1;
+                    } else {
+                        movieIdCounter = 1;
+                    }
                     console.log('✅ Loaded movies from movies.json file (backend not available)');
                     return true;
                 }
