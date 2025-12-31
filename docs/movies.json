@@ -1,0 +1,30 @@
+{
+  "movies": [
+    {
+      "id": 1,
+      "title": "Natrang",
+      "language": "marathi",
+      "url": "https://www.youtube.com/embed/sample1",
+      "image_url": "https://via.placeholder.com/300x400?text=Natrang",
+      "release_date": "2023-01-15"
+    },
+    {
+      "id": 2,
+      "title": "Laal Singh Chaddha",
+      "language": "hindi",
+      "url": "https://www.youtube.com/embed/sample2",
+      "image_url": "https://via.placeholder.com/300x400?text=Laal+Singh",
+      "release_date": "2023-02-20"
+    },
+    {
+      "id": 3,
+      "title": "Sardar Udham",
+      "language": "punjabi",
+      "url": "https://www.youtube.com/embed/sample3",
+      "image_url": "https://via.placeholder.com/300x400?text=Sardar+Udham",
+      "release_date": "2023-03-10"
+    }
+  ],
+  "nextId": 4,
+  "lastUpdated": "2025-12-31T10:00:00.000Z"
+}
