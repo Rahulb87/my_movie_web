@@ -7,40 +7,57 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Simple in-memory database (for demo purposes)
+# Path to movies.json file
+MOVIES_JSON_PATH = os.path.join(os.path.dirname(__file__), '..', 'docs', 'movies.json')
+
+# In-memory database
 movies_db = []
 next_id = 1
 
-# Sample data
-sample_movies = [
-    {
-        'id': 1,
-        'title': 'Natrang',
-        'language': 'marathi',
-        'url': 'https://www.youtube.com/embed/sample1',
-        'image_url': 'https://via.placeholder.com/300x400?text=Natrang',
-        'release_date': '2023-01-15'
-    },
-    {
-        'id': 2,
-        'title': 'Laal Singh Chaddha',
-        'language': 'hindi',
-        'url': 'https://www.youtube.com/embed/sample2',
-        'image_url': 'https://via.placeholder.com/300x400?text=Laal+Singh',
-        'release_date': '2023-02-20'
-    },
-    {
-        'id': 3,
-        'title': 'Sardar Udham',
-        'language': 'punjabi',
-        'url': 'https://www.youtube.com/embed/sample3',
-        'image_url': 'https://via.placeholder.com/300x400?text=Sardar+Udham',
-        'release_date': '2023-03-10'
-    }
-]
+# Load movies from movies.json on startup
+def load_movies_from_file():
+    global movies_db, next_id
+    try:
+        if os.path.exists(MOVIES_JSON_PATH):
+            with open(MOVIES_JSON_PATH, 'r') as f:
+                data = json.load(f)
+                # Handle both array format and object format
+                if isinstance(data, list):
+                    movies_db = data
+                elif isinstance(data, dict) and 'movies' in data:
+                    movies_db = data['movies']
+                else:
+                    movies_db = []
+                
+                # Set next_id to max ID + 1
+                if movies_db:
+                    max_id = max(movie['id'] for movie in movies_db)
+                    next_id = max_id + 1
+                else:
+                    next_id = 1
+                
+                print(f'✅ Loaded {len(movies_db)} movies from {MOVIES_JSON_PATH}')
+        else:
+            print(f'⚠️ movies.json file not found at {MOVIES_JSON_PATH}')
+            movies_db = []
+            next_id = 1
+    except Exception as e:
+        print(f'❌ Error loading movies.json: {e}')
+        movies_db = []
+        next_id = 1
 
-movies_db.extend(sample_movies)
-next_id = 4
+# Save movies to movies.json file
+def save_movies_to_file():
+    try:
+        os.makedirs(os.path.dirname(MOVIES_JSON_PATH), exist_ok=True)
+        with open(MOVIES_JSON_PATH, 'w') as f:
+            json.dump(movies_db, f, indent=2)
+        print(f'✅ Saved {len(movies_db)} movies to {MOVIES_JSON_PATH}')
+    except Exception as e:
+        print(f'❌ Error saving movies.json: {e}')
+
+# Load movies on startup
+load_movies_from_file()
 
 # Routes
 
@@ -87,6 +104,7 @@ def create_movie():
     
     movies_db.append(new_movie)
     next_id += 1
+    save_movies_to_file()  # Persist to movies.json
     
     return jsonify(new_movie), 201
 
@@ -112,6 +130,7 @@ def update_movie(movie_id):
     if 'release_date' in data:
         movie['release_date'] = data['release_date']
     
+    save_movies_to_file()  # Persist to movies.json
     return jsonify(movie)
 
 @app.route('/api/movies/<int:movie_id>', methods=['DELETE'])
@@ -125,6 +144,7 @@ def delete_movie(movie_id):
         return jsonify({'error': 'Movie not found'}), 404
     
     movies_db = [m for m in movies_db if m['id'] != movie_id]
+    save_movies_to_file()  # Persist to movies.json
     
     return jsonify({'message': 'Movie deleted successfully'})
 
